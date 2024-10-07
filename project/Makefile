@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS= 
+OPENSSL_DIR=/opt/homebrew/opt/openssl@3
+CFLAGS=-I$(OPENSSL_DIR)/include -L$(OPENSSL_DIR)/lib -lssl -lcrypto  # Add OpenSSL include and lib flags
 
 all: clean build
 
