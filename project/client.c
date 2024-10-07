@@ -5,19 +5,35 @@
 #include <errno.h>
 #include <openssl/evp.h>
 
-int main()
+int main(int argc, char **argv)
 {
+   if (argc < 3)
+   {
+      fprintf(stderr, "Usage: %s <hostname> <port>\n", argv[0]);
+      return 1;
+   }
+   // Get hostname and port
+   char *hostname = argv[1];
+   int port = atoi(argv[2]);
+   fprintf(stderr, "Connecting to %s:%d\n", hostname, port);
+
    /* 1. Create socket */
    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
    // use IPv4  use UDP
 
    /* 2. Construct server address */
    struct sockaddr_in serveraddr;
+
    serveraddr.sin_family = AF_INET; // use IPv4
-   serveraddr.sin_addr.s_addr = INADDR_ANY;
+
+   // Set sending address
+   if (strcmp(hostname, "localhost") == 0)
+      serveraddr.sin_addr.s_addr = INADDR_LOOPBACK;
+   else
+      serveraddr.sin_addr.s_addr = inet_addr(hostname);
+
    // Set sending port
-   int SEND_PORT = 8080;
-   serveraddr.sin_port = htons(SEND_PORT); // Big endian
+   serveraddr.sin_port = htons(port); // Big endian
 
    /* 3. Send data to server */
    char client_buf[] = "Hello world!";
