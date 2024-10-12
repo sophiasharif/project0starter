@@ -53,25 +53,30 @@ int main()
       if (bytes_recvd <= 0 && !client_connected)
          continue;
 
-      /* 6. Inspect data from client */
-      char *client_ip = inet_ntoa(clientaddr.sin_addr);
-      // "Network bytes to address string"
-      int client_port = ntohs(clientaddr.sin_port); // Little endian
-      // Print out data
-      write(1, client_buf, bytes_recvd);
+      client_connected = 1;
+
+      if (bytes_recvd > 0)
+      {
+         /* 6. Inspect data from client */
+         char *client_ip = inet_ntoa(clientaddr.sin_addr);
+         // "Network bytes to address string"
+         int client_port = ntohs(clientaddr.sin_port); // Little endian
+         // Print out data
+         write(1, client_buf, bytes_recvd);
+      }
+      char server_buf[] = "Hello world!";
+      int did_send = sendto(sockfd, server_buf, strlen(server_buf),
+                            // socket  send data   how much to send
+                            0, (struct sockaddr *)&clientaddr,
+                            // flags   where to send
+                            sizeof(clientaddr));
+      if (did_send < 0)
+         return errno;
+
+      // /* 8. You're done! Terminate the connection */
+      // close(sockfd);
    }
 
    /* 7. Send data back to client */
-   char server_buf[] = "Hello world!";
-   int did_send = sendto(sockfd, server_buf, strlen(server_buf),
-                         // socket  send data   how much to send
-                         0, (struct sockaddr *)&clientaddr,
-                         // flags   where to send
-                         sizeof(clientaddr));
-   if (did_send < 0)
-      return errno;
-
-   /* 8. You're done! Terminate the connection */
-   close(sockfd);
    return 0;
 }
