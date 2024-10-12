@@ -77,8 +77,8 @@ int main()
                             0, (struct sockaddr *)&clientaddr,
                             // flags   where to send
                             sizeof(clientaddr));
-      if (did_send < 0)
-         return errno;
+      // if (did_send < 0)
+      //    return errno;
 
       // /* 8. You're done! Terminate the connection */
       // close(sockfd);
