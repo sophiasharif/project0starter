@@ -15,6 +15,10 @@ int main()
    int flags = fcntl(sockfd, F_GETFL, 0);
    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
+   // make stdin non-blocking
+   // flags = fcntl(0, F_GETFL, 0);
+   // fcntl(0, F_SETFL, flags | O_NONBLOCK);
+
    /* 2. Construct our address */
    struct sockaddr_in servaddr;
    servaddr.sin_family = AF_INET;         // use IPv4
@@ -64,7 +68,10 @@ int main()
          // Print out data
          write(1, client_buf, bytes_recvd);
       }
-      char server_buf[] = "Hello world!";
+      // read from stdin
+
+      char server_buf[1024];
+      int bytes_read = read(0, server_buf, 1024);
       int did_send = sendto(sockfd, server_buf, strlen(server_buf),
                             // socket  send data   how much to send
                             0, (struct sockaddr *)&clientaddr,
