@@ -48,7 +48,7 @@ int main()
       /* 3. Send data to server */
       char client_buf[BUF_SIZE];
       int bytes_read = read(0, client_buf, 1024);
-      int did_send = sendto(sockfd, client_buf, strlen(client_buf),
+      int did_send = sendto(sockfd, client_buf, bytes_read,
                             // socket  send data   how much to send
                             0, (struct sockaddr *)&serveraddr,
                             // flags   where to send
