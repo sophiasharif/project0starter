@@ -67,9 +67,6 @@ int main()
 
       if (bytes_recvd > 0)
       {
-         // Print out data
-         fprintf(stderr, "bytes_recvd: %d\n", bytes_recvd);
-
          write(1, client_buf, bytes_recvd);
       }
       // read from stdin
