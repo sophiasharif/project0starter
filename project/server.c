@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 int main()
 {
@@ -16,8 +17,8 @@ int main()
    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
    // make stdin non-blocking
-   // flags = fcntl(0, F_GETFL, 0);
-   // fcntl(0, F_SETFL, flags | O_NONBLOCK);
+   flags = fcntl(0, F_GETFL, 0);
+   fcntl(0, F_SETFL, flags | O_NONBLOCK);
 
    /* 2. Construct our address */
    struct sockaddr_in servaddr;
@@ -67,6 +68,8 @@ int main()
       if (bytes_recvd > 0)
       {
          // Print out data
+         fprintf(stderr, "bytes_recvd: %d\n", bytes_recvd);
+
          write(1, client_buf, bytes_recvd);
       }
       // read from stdin
