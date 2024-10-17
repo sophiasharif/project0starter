@@ -58,13 +58,14 @@ int main()
          continue;
 
       client_connected = 1;
+      // why do we need these variables?
+      /* 6. Inspect data from client */
+      char *client_ip = inet_ntoa(clientaddr.sin_addr);
+      // "Network bytes to address string"
+      int client_port = ntohs(clientaddr.sin_port); // Little endian
 
       if (bytes_recvd > 0)
       {
-         /* 6. Inspect data from client */
-         char *client_ip = inet_ntoa(clientaddr.sin_addr);
-         // "Network bytes to address string"
-         int client_port = ntohs(clientaddr.sin_port); // Little endian
          // Print out data
          write(1, client_buf, bytes_recvd);
       }
