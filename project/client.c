@@ -48,13 +48,12 @@ int main(int argc, char **argv)
    // int SEND_PORT = 8080;
    serveraddr.sin_port = htons(port); // Big endian
 
-   /* 4. Create buffer to store incoming data */
-   int BUF_SIZE = 1024;
-   char server_buf[BUF_SIZE];
-   socklen_t serversize = sizeof(socklen_t); // Temp buffer for recvfrom API
-
    while (1)
    {
+      /* 4. Create buffer to store incoming data */
+      int BUF_SIZE = 1024;
+      char server_buf[BUF_SIZE];
+      socklen_t serversize = sizeof(socklen_t); // Temp buffer for recvfrom API
 
       /* 5. Listen for response from server */
       int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
@@ -68,12 +67,21 @@ int main(int argc, char **argv)
 
       /* 3. Send data to server */
       char client_buf[BUF_SIZE];
+
       int bytes_read = read(0, client_buf, 1024);
-      int did_send = sendto(sockfd, client_buf, bytes_read,
-                            // socket  send data   how much to send
-                            0, (struct sockaddr *)&serveraddr,
-                            // flags   where to send
-                            sizeof(serveraddr));
+      if (bytes_read > 0)
+      {
+         int did_send = sendto(sockfd, client_buf, bytes_read,
+                               // socket  send data   how much to send
+                               0, (struct sockaddr *)&serveraddr,
+                               // flags   where to send
+                               sizeof(serveraddr));
+         if (did_send < 0)
+         {
+            fprintf(stderr, "Error sending data to server\n");
+            return errno;
+         }
+      }
       // if (did_send < 0)
       //    return errno;
    }
