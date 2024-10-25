@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <openssl/evp.h>
 #include <fcntl.h>
+#include "util.h"
 
 int main(int argc, char **argv)
 {
@@ -47,13 +48,13 @@ int main(int argc, char **argv)
    // int SEND_PORT = 8080;
    serveraddr.sin_port = htons(port); // Big endian
 
+   /* 4. Create buffer to store incoming data */
+   int BUF_SIZE = 1024;
+   char server_buf[BUF_SIZE];
+   socklen_t serversize = sizeof(socklen_t); // Temp buffer for recvfrom API
+
    while (1)
    {
-
-      /* 4. Create buffer to store incoming data */
-      int BUF_SIZE = 1024;
-      char server_buf[BUF_SIZE];
-      socklen_t serversize = sizeof(socklen_t); // Temp buffer for recvfrom API
 
       /* 5. Listen for response from server */
       int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,

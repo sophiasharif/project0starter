@@ -7,8 +7,8 @@ all: clean build
 default: build
 
 build: server.c client.c 
-	${CC} -o server server.c ${CFLAGS}
-	${CC} -o client client.c ${CFLAGS}
+	${CC} -o server server.c util.c ${CFLAGS}
+	${CC} -o client client.c util.c ${CFLAGS}
 
 clean:
 	rm -rf server client *.bin *.out *.dSYM

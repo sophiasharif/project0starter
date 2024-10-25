@@ -5,9 +5,16 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-int main()
+int main(int argc, char **argv)
 {
+   if (argc != 2)
+   {
+      fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+      return 1;
+   }
+   int port = atoi(argv[1]);
    /* 1. Create socket */
    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
    // use IPv4  use UDP
@@ -27,8 +34,7 @@ int main()
                                           // same as inet_addr("0.0.0.0")
                                           // "Address string to network bytes"
    // Set receiving port
-   int PORT = 8080;
-   servaddr.sin_port = htons(PORT); // Big endian
+   servaddr.sin_port = htons(port); // Big endian
 
    /* 3. Let operating system know about our config */
    int did_bind = bind(sockfd, (struct sockaddr *)&servaddr,
