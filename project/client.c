@@ -52,7 +52,7 @@ int main(int argc, char **argv)
       // Execution will stop here until `BUF_SIZE` is read or termination/error
       char server_buf[BUF_SIZE];
 
-      int bytes_recvd = send_packet(sockfd, server_buf, serveraddr);
+      int bytes_recvd = send_packet(sockfd, server_buf, serveraddr, sizeof(socklen_t));
       // Error if bytes_recvd < 0 :(
       if (bytes_recvd > 0)
          write(1, server_buf, bytes_recvd);

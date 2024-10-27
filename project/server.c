@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "util.h"
 
 int main(int argc, char **argv)
 {
@@ -44,7 +45,6 @@ int main(int argc, char **argv)
       return errno;
 
    /* 4. Create buffer to store incoming data */
-   int BUF_SIZE = 1024;
    char client_buf[BUF_SIZE];
    struct sockaddr_in clientaddr; // Same information, but about client
    socklen_t clientsize = sizeof(clientaddr);
@@ -54,7 +54,6 @@ int main(int argc, char **argv)
 
    while (1)
    {
-
       int bytes_recvd = recvfrom(sockfd, client_buf, BUF_SIZE,
                                  // socket  store data  how much
                                  0, (struct sockaddr *)&clientaddr,

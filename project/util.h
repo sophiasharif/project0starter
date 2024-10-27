@@ -2,4 +2,4 @@
 #include <arpa/inet.h>
 
 extern int BUF_SIZE;
-int send_packet(int sockfd, char server_buf[BUF_SIZE], struct sockaddr_in serveraddr);
+int send_packet(int sockfd, char server_buf[BUF_SIZE], struct sockaddr_in serveraddr, socklen_t address_size);
