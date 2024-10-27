@@ -1,5 +1,3 @@
-#include <sys/socket.h>
-#include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -50,17 +48,11 @@ int main(int argc, char **argv)
 
    while (1)
    {
-      /* 4. Create buffer to store incoming data */
-      int BUF_SIZE = 1024;
-      char server_buf[BUF_SIZE];
-      socklen_t serversize = sizeof(socklen_t); // Temp buffer for recvfrom API
 
-      /* 5. Listen for response from server */
-      int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
-                                 // socket  store data  how much
-                                 0, (struct sockaddr *)&serveraddr,
-                                 &serversize);
       // Execution will stop here until `BUF_SIZE` is read or termination/error
+      char server_buf[BUF_SIZE];
+
+      int bytes_recvd = send_packet(sockfd, server_buf, serveraddr);
       // Error if bytes_recvd < 0 :(
       if (bytes_recvd > 0)
          write(1, server_buf, bytes_recvd);
@@ -87,3 +79,37 @@ int main(int argc, char **argv)
    }
    return 0;
 }
+
+/*
+switch(client_state) {
+   case CLIENT_START:
+      send packet with:
+         - sequence number = random number between 0 and half of the max size
+         - ack number = 0
+         - length = 0
+         - flags = 0b10000000 (SYN)
+         - payload = NULL
+   case CLIENT_AWAIT:
+      send packet with:
+         - sequence number = SEQ + 1 (client sequence number + 1)
+         - ack number = server sequence number + 1
+         - flags = 0b01000000 (ACK)
+         - length = 0
+         - payload = NULL
+   case CLIENT_AWAIT_2:
+   case CONNECTED:
+}
+
+switch(server_state) {
+   case SERVER_START:
+      send packet with:
+         - sequence number = random number between 0 and half of the max size
+         - ack number = client sequence number + 1
+         - length = 0
+         - flags = 0b11000000 (SYN+ACK)
+         - payload = NULL
+   case SERVER_SYN:
+   case SERVER_AWAIT_2:
+   case CONNECTED:
+}
+*/
