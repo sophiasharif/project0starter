@@ -5,18 +5,23 @@
 #include <fcntl.h>
 #include "util.h"
 
-int main(int argc, char **argv)
+void get_host_and_port(char **hostname, int *port, int argc, char **argv)
 {
-
    if (argc != 3)
    {
       printf("Usage: %s <hostname> <port\n", argv[0]);
-      return 1;
+      exit(1);
    }
 
-   // get hostname and port
-   char *hostname = argv[1];
-   int port = atoi(argv[2]);
+   *hostname = argv[1];
+   *port = atoi(argv[2]);
+}
+
+int main(int argc, char **argv)
+{
+   char *hostname;
+   int port;
+   get_host_and_port(&hostname, &port, argc, argv);
 
    /* 1. Create socket */
    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -52,7 +57,7 @@ int main(int argc, char **argv)
       // Execution will stop here until `BUF_SIZE` is read or termination/error
       char server_buf[BUF_SIZE];
 
-      int bytes_recvd = send_packet(sockfd, server_buf, serveraddr, sizeof(socklen_t));
+      int bytes_recvd = read_from_socket(sockfd, server_buf, serveraddr, sizeof(socklen_t));
       // Error if bytes_recvd < 0 :(
       if (bytes_recvd > 0)
          write(1, server_buf, bytes_recvd);

@@ -5,7 +5,7 @@
 
 int BUF_SIZE = 1024;
 
-int send_packet(int sockfd, char server_buf[BUF_SIZE], struct sockaddr_in serveraddr, socklen_t address_size)
+int read_from_socket(int sockfd, char server_buf[BUF_SIZE], struct sockaddr_in serveraddr, socklen_t address_size)
 {
     /* 5. Listen for response from server */
     int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
