@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <stdexcept>
 
-int BUF_SIZE = 1024;
+using namespace std;
 
-int read_from_socket(int sockfd, char server_buf[BUF_SIZE], struct sockaddr_in serveraddr, socklen_t address_size)
+int read_from_socket(int sockfd, char server_buf[1024], struct sockaddr_in serveraddr, socklen_t address_size)
 {
     /* 5. Listen for response from server */
-    int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
+    int bytes_recvd = recvfrom(sockfd, server_buf, 1024,
                                // socket  store data  how much
                                0, (struct sockaddr *)&serveraddr,
                                &address_size);

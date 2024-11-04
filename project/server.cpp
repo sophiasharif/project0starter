@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "util.h"
+#include "socket.h"
 
 int main(int argc, char **argv)
 {
@@ -18,6 +19,7 @@ int main(int argc, char **argv)
    int port = atoi(argv[1]);
    /* 1. Create socket */
    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+   Socket socket;
    // use IPv4  use UDP
 
    // make socket non-blocking (update internal fd flags)
@@ -45,6 +47,7 @@ int main(int argc, char **argv)
       return errno;
 
    /* 4. Create buffer to store incoming data */
+   int BUF_SIZE = 1024;
    char client_buf[BUF_SIZE];
    struct sockaddr_in clientaddr; // Same information, but about client
    socklen_t clientsize = sizeof(clientaddr);

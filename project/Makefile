@@ -1,4 +1,4 @@
-CC=gcc  -g
+CC=g++  -g
 OPENSSL_DIR=/opt/homebrew/opt/openssl@3
 CFLAGS=-I$(OPENSSL_DIR)/include -L$(OPENSSL_DIR)/lib -lssl -lcrypto  # Add OpenSSL include and lib flags
 
@@ -6,9 +6,9 @@ all: clean build
 
 default: build
 
-build: server.c client.c 
-	${CC} -o server server.c util.c ${CFLAGS}
-	${CC} -o client client.c util.c ${CFLAGS}
+build: server.cpp client.cpp 
+	${CC} -o server server.cpp util.cpp socket.cpp ${CFLAGS}
+	${CC} -o client client.cpp util.cpp socket.cpp ${CFLAGS}
 
 clean:
 	rm -rf server client *.bin *.out *.dSYM
@@ -16,5 +16,5 @@ clean:
 zip: clean
 	rm -f project0.zip
 	mkdir -p project
-	cp server.c client.c Makefile project
+	cp *.cpp *.h Makefile project
 	zip project0.zip project/*

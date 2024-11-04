@@ -4,12 +4,13 @@
 #include <openssl/evp.h>
 #include <fcntl.h>
 #include "util.h"
+#include "socket.h"
 
 void get_host_and_port(char **hostname, int *port, int argc, char **argv)
 {
    if (argc != 3)
    {
-      printf("Usage: %s <hostname> <port\n", argv[0]);
+      printf("Usage: %s <hostname> <port>\n", argv[0]);
       exit(1);
    }
 
@@ -54,8 +55,8 @@ int main(int argc, char **argv)
    while (1)
    {
 
-      // Execution will stop here until `BUF_SIZE` is read or termination/error
-      char server_buf[BUF_SIZE];
+      // Execution will stop here until `1024` is read or termination/error
+      char server_buf[1024];
 
       int bytes_recvd = read_from_socket(sockfd, server_buf, serveraddr, sizeof(socklen_t));
       // Error if bytes_recvd < 0 :(
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
          write(1, server_buf, bytes_recvd);
 
       /* 3. Send data to server */
-      char client_buf[BUF_SIZE];
+      char client_buf[1024];
 
       int bytes_read = read(0, client_buf, 1024);
       if (bytes_read > 0)
