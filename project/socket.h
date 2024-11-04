@@ -5,10 +5,11 @@
 class Socket
 {
     int sockfd;
-    struct sockaddr_in my_addr;
+    struct sockaddr_in other_addr;
 
 public:
     Socket(int port);
+    int get_sockfd() { return sockfd; }
 };
 
 #endif
