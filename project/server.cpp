@@ -19,16 +19,11 @@ int main(int argc, char **argv)
    int port = atoi(argv[1]);
    /* 1. Create socket */
    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-   Socket socket;
-   // use IPv4  use UDP
+   Socket socket(port);
 
    // make socket non-blocking (update internal fd flags)
    int flags = fcntl(sockfd, F_GETFL, 0);
    fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-
-   // make stdin non-blocking
-   flags = fcntl(0, F_GETFL, 0);
-   fcntl(0, F_SETFL, flags | O_NONBLOCK);
 
    /* 2. Construct our address */
    struct sockaddr_in servaddr;
