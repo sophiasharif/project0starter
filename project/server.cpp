@@ -17,13 +17,7 @@ int main(int argc, char **argv)
       return 1;
    }
    int port = atoi(argv[1]);
-   /* 1. Create socket */
-   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
    Socket socket(port);
-
-   // make socket non-blocking (update internal fd flags)
-   int flags = fcntl(sockfd, F_GETFL, 0);
-   fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 
    /* 2. Construct our address */
    struct sockaddr_in servaddr;
@@ -35,7 +29,7 @@ int main(int argc, char **argv)
    servaddr.sin_port = htons(port); // Big endian
 
    /* 3. Let operating system know about our config */
-   int did_bind = bind(sockfd, (struct sockaddr *)&servaddr,
+   int did_bind = bind(socket.get_sockfd(), (struct sockaddr *)&servaddr,
                        sizeof(servaddr));
    // Error if did_bind < 0 :(
    if (did_bind < 0)
@@ -52,7 +46,7 @@ int main(int argc, char **argv)
 
    while (1)
    {
-      int bytes_recvd = recvfrom(sockfd, client_buf, BUF_SIZE,
+      int bytes_recvd = recvfrom(socket.get_sockfd(), client_buf, BUF_SIZE,
                                  // socket  store data  how much
                                  0, (struct sockaddr *)&clientaddr,
                                  &clientsize);
@@ -76,7 +70,7 @@ int main(int argc, char **argv)
 
       char server_buf[1024];
       int bytes_read = read(0, server_buf, 1024);
-      int did_send = sendto(sockfd, server_buf, bytes_read,
+      int did_send = sendto(socket.get_sockfd(), server_buf, bytes_read,
                             // socket  send data   how much to send
                             0, (struct sockaddr *)&clientaddr,
                             // flags   where to send
