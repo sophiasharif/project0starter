@@ -40,14 +40,8 @@ void ServerSocket::send_to_socket()
     {
         char server_buf[BUF_SIZE];
         int bytes_read = read(0, server_buf, BUF_SIZE);
-        int did_send = sendto(sockfd, server_buf, bytes_read,
-                              0, (struct sockaddr *)&clientaddr,
-                              sizeof(clientaddr));
-        // if (did_send < 0)
-        // {
-        //     std::cerr << "Error sending data to client" << std::endl;
-        //     std::cerr << errno << std::endl;
-        //     throw runtime_error("Failed to send data to client");
-        // }
+        sendto(sockfd, server_buf, bytes_read,
+               0, (struct sockaddr *)&clientaddr,
+               sizeof(clientaddr));
     }
 }
