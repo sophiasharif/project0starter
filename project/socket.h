@@ -4,12 +4,17 @@
 
 class Socket
 {
-    int sockfd;
-    struct sockaddr_in other_addr;
-
 public:
     Socket(int port);
+    virtual ~Socket();
     int get_sockfd() { return sockfd; }
+
+protected:
+    int port;
+
+private:
+    int sockfd;
+    struct sockaddr_in other_addr;
 };
 
 #endif

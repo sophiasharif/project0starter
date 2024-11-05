@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <stdexcept>
 #include <fcntl.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -16,4 +17,10 @@ Socket::Socket(int port)
     // make socket non-blocking (update internal fd flags)
     int flags = fcntl(sockfd, F_GETFL, 0);
     fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+    port = port;
+}
+
+Socket::~Socket()
+{
+    close(sockfd);
 }
