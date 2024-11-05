@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "util.h"
-#include "socket.h"
+#include "server_socket.h"
 
 int main(int argc, char **argv)
 {
@@ -17,23 +17,7 @@ int main(int argc, char **argv)
       return 1;
    }
    int port = atoi(argv[1]);
-   Socket socket(port);
-
-   /* 2. Construct our address */
-   struct sockaddr_in servaddr;
-   servaddr.sin_family = AF_INET;         // use IPv4
-   servaddr.sin_addr.s_addr = INADDR_ANY; // accept all connections
-                                          // same as inet_addr("0.0.0.0")
-                                          // "Address string to network bytes"
-   // Set receiving port
-   servaddr.sin_port = htons(port); // Big endian
-
-   /* 3. Let operating system know about our config */
-   int did_bind = bind(socket.get_sockfd(), (struct sockaddr *)&servaddr,
-                       sizeof(servaddr));
-   // Error if did_bind < 0 :(
-   if (did_bind < 0)
-      return errno;
+   ServerSocket socket(port);
 
    // make stdin non-blocking
    int flags = fcntl(0, F_GETFL, 0);

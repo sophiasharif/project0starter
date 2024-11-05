@@ -11,10 +11,8 @@ public:
 
 protected:
     int port;
-
-private:
+    struct sockaddr_in servaddr;
     int sockfd;
-    struct sockaddr_in other_addr;
 };
 
 #endif

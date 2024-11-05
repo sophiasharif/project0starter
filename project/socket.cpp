@@ -14,10 +14,16 @@ Socket::Socket(int port)
     {
         throw runtime_error("Failed to create socket");
     }
+
     // make socket non-blocking (update internal fd flags)
     int flags = fcntl(sockfd, F_GETFL, 0);
     fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
     port = port;
+
+    // set up server address
+    servaddr.sin_family = AF_INET;         // use IPv4
+    servaddr.sin_addr.s_addr = INADDR_ANY; // accept all connections
+    servaddr.sin_port = htons(port);       // Big endian
 }
 
 Socket::~Socket()
