@@ -35,6 +35,10 @@ int main(int argc, char **argv)
    if (did_bind < 0)
       return errno;
 
+   // make stdin non-blocking
+   int flags = fcntl(0, F_GETFL, 0);
+   fcntl(0, F_SETFL, flags | O_NONBLOCK);
+
    /* 4. Create buffer to store incoming data */
    int BUF_SIZE = 1024;
    char client_buf[BUF_SIZE];
