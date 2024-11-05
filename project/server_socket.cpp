@@ -1,6 +1,7 @@
 #include "server_socket.h"
 #include <stdexcept>
 #include <unistd.h>
+#include <iostream>
 
 using namespace std;
 
@@ -30,5 +31,23 @@ void ServerSocket::read_from_socket()
     {
         client_connected = 1;
         write(1, client_buf, bytes_recvd);
+    }
+}
+
+void ServerSocket::send_to_socket()
+{
+    if (client_connected)
+    {
+        char server_buf[BUF_SIZE];
+        int bytes_read = read(0, server_buf, BUF_SIZE);
+        int did_send = sendto(sockfd, server_buf, bytes_read,
+                              0, (struct sockaddr *)&clientaddr,
+                              sizeof(clientaddr));
+        // if (did_send < 0)
+        // {
+        //     std::cerr << "Error sending data to client" << std::endl;
+        //     std::cerr << errno << std::endl;
+        //     throw runtime_error("Failed to send data to client");
+        // }
     }
 }

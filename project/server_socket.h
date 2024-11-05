@@ -8,6 +8,7 @@ class ServerSocket : public Socket
 public:
     ServerSocket(int port);
     void read_from_socket();
+    void send_to_socket();
     struct sockaddr_in clientaddr;
     int client_connected;
 
