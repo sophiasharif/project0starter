@@ -8,6 +8,7 @@ class ClientSocket : public Socket
 {
 public:
     ClientSocket(int port, std::string hostname);
+    void read_from_socket();
 };
 
 #endif

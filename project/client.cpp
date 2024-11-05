@@ -33,12 +33,13 @@ int main(int argc, char **argv)
    {
 
       // Execution will stop here until `1024` is read or termination/error
-      char server_buf[1024];
+      // char server_buf[1024];
 
-      int bytes_recvd = read_from_socket(socket.get_sockfd(), server_buf, socket.servaddr, sizeof(socklen_t));
-      // Error if bytes_recvd < 0 :(
-      if (bytes_recvd > 0)
-         write(1, server_buf, bytes_recvd);
+      // int bytes_recvd = read_from_socket(socket.get_sockfd(), server_buf, socket.servaddr, sizeof(socklen_t));
+      // // Error if bytes_recvd < 0 :(
+      // if (bytes_recvd > 0)
+      //    write(1, server_buf, bytes_recvd);
+      socket.read_from_socket();
 
       /* 3. Send data to server */
       char client_buf[1024];
