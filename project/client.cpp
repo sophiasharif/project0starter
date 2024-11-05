@@ -32,26 +32,7 @@ int main(int argc, char **argv)
    while (1)
    {
       socket.read_from_socket();
-
-      /* 3. Send data to server */
-      char client_buf[1024];
-
-      int bytes_read = read(0, client_buf, 1024);
-      if (bytes_read > 0)
-      {
-         int did_send = sendto(socket.get_sockfd(), client_buf, bytes_read,
-                               // socket  send data   how much to send
-                               0, (struct sockaddr *)&(socket.servaddr),
-                               // flags   where to send
-                               sizeof(socket.servaddr));
-         if (did_send < 0)
-         {
-            fprintf(stderr, "Error sending data to server\n");
-            return errno;
-         }
-      }
-      // if (did_send < 0)
-      //    return errno;
+      socket.send_to_socket();
    }
    return 0;
 }

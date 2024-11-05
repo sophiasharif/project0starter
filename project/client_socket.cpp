@@ -22,3 +22,22 @@ void ClientSocket::read_from_socket()
     if (bytes_recvd > 0)
         write(1, server_buf, bytes_recvd);
 }
+
+void ClientSocket::send_to_socket()
+{
+    char client_buf[1024];
+
+    int bytes_read = read(0, client_buf, 1024);
+    if (bytes_read > 0)
+    {
+        int did_send = sendto(sockfd, client_buf, bytes_read,
+                              // socket  send data   how much to send
+                              0, (struct sockaddr *)&(servaddr),
+                              // flags   where to send
+                              sizeof(servaddr));
+        if (did_send < 0)
+        {
+            throw runtime_error("Error sending data to server");
+        }
+    }
+}
