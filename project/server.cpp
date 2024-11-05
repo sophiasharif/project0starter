@@ -23,15 +23,6 @@ int main(int argc, char **argv)
    int flags = fcntl(0, F_GETFL, 0);
    fcntl(0, F_SETFL, flags | O_NONBLOCK);
 
-   /* 4. Create buffer to store incoming data */
-   int BUF_SIZE = 1024;
-   char client_buf[BUF_SIZE];
-   struct sockaddr_in clientaddr; // Same information, but about client
-   socklen_t clientsize = sizeof(clientaddr);
-
-   /* 5. Listen for data from clients */
-   int client_connected = 0;
-
    while (1)
    {
       socket.read_from_socket();

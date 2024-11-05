@@ -10,6 +10,7 @@ public:
     int get_sockfd() { return sockfd; }
     struct sockaddr_in servaddr;
     static const int BUF_SIZE = 1024;
+    virtual void read_from_socket() = 0;
 
 protected:
     int port;
