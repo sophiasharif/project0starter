@@ -4,7 +4,7 @@
 #include <openssl/evp.h>
 #include <fcntl.h>
 #include "util.h"
-#include "socket.h"
+#include "client_socket.h"
 
 void get_host_and_port(char **hostname, int *port, int argc, char **argv)
 {
@@ -24,34 +24,10 @@ int main(int argc, char **argv)
    int port;
    get_host_and_port(&hostname, &port, argc, argv);
 
-   /* 1. Create socket */
-   // int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-   Socket socket(port);
-   // use IPv4  use UDP
-
-   // make socket non-blocking (update internal fd flags)
-   // int flags = fcntl(sockfd, F_GETFL, 0);
-   // fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+   ClientSocket socket(port, argv[1]);
 
    int flags = fcntl(0, F_GETFL, 0);
    fcntl(0, F_SETFL, flags | O_NONBLOCK);
-
-   /* 2. Construct server address */
-   struct sockaddr_in serveraddr;
-   serveraddr.sin_family = AF_INET; // use IPv4
-
-   if (strcmp(hostname, "localhost") == 0)
-   {
-      // should this be INADDR_LOOPBACK?
-      serveraddr.sin_addr.s_addr = INADDR_ANY;
-   }
-   else
-   {
-      serveraddr.sin_addr.s_addr = inet_addr(hostname);
-   }
-   // Set sending port
-   // int SEND_PORT = 8080;
-   serveraddr.sin_port = htons(port); // Big endian
 
    while (1)
    {
@@ -59,7 +35,7 @@ int main(int argc, char **argv)
       // Execution will stop here until `1024` is read or termination/error
       char server_buf[1024];
 
-      int bytes_recvd = read_from_socket(socket.get_sockfd(), server_buf, serveraddr, sizeof(socklen_t));
+      int bytes_recvd = read_from_socket(socket.get_sockfd(), server_buf, socket.servaddr, sizeof(socklen_t));
       // Error if bytes_recvd < 0 :(
       if (bytes_recvd > 0)
          write(1, server_buf, bytes_recvd);
@@ -72,9 +48,9 @@ int main(int argc, char **argv)
       {
          int did_send = sendto(socket.get_sockfd(), client_buf, bytes_read,
                                // socket  send data   how much to send
-                               0, (struct sockaddr *)&serveraddr,
+                               0, (struct sockaddr *)&(socket.servaddr),
                                // flags   where to send
-                               sizeof(serveraddr));
+                               sizeof(socket.servaddr));
          if (did_send < 0)
          {
             fprintf(stderr, "Error sending data to server\n");

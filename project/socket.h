@@ -8,10 +8,10 @@ public:
     Socket(int port);
     virtual ~Socket();
     int get_sockfd() { return sockfd; }
+    struct sockaddr_in servaddr;
 
 protected:
     int port;
-    struct sockaddr_in servaddr;
     int sockfd;
 };
 
