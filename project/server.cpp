@@ -16,12 +16,8 @@ int main(int argc, char **argv)
       fprintf(stderr, "Usage: %s <port>\n", argv[0]);
       return 1;
    }
-   int port = atoi(argv[1]);
-   ServerSocket socket(port);
 
-   // make stdin non-blocking
-   int flags = fcntl(0, F_GETFL, 0);
-   fcntl(0, F_SETFL, flags | O_NONBLOCK);
+   ServerSocket socket(atoi(argv[1]));
 
    while (1)
    {

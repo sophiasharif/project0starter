@@ -6,28 +6,14 @@
 #include "util.h"
 #include "client_socket.h"
 
-void get_host_and_port(char **hostname, int *port, int argc, char **argv)
+int main(int argc, char **argv)
 {
    if (argc != 3)
    {
       printf("Usage: %s <hostname> <port>\n", argv[0]);
       exit(1);
    }
-
-   *hostname = argv[1];
-   *port = atoi(argv[2]);
-}
-
-int main(int argc, char **argv)
-{
-   char *hostname;
-   int port;
-   get_host_and_port(&hostname, &port, argc, argv);
-
-   ClientSocket socket(port, argv[1]);
-
-   int flags = fcntl(0, F_GETFL, 0);
-   fcntl(0, F_SETFL, flags | O_NONBLOCK);
+   ClientSocket socket(atoi(argv[2]), argv[1]);
 
    while (1)
    {
