@@ -15,7 +15,7 @@ void ClientSocket::read_from_socket()
 {
     char server_buf[1024];
     socklen_t address_size = sizeof(socklen_t);
-    int bytes_recvd = recvfrom(sockfd, server_buf, 1024,
+    int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
                                // socket  store data  how much
                                0, (struct sockaddr *)&servaddr,
                                &address_size);
