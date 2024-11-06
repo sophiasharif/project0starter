@@ -17,8 +17,9 @@ int main(int argc, char **argv)
 
    while (1)
    {
-      socket.read_from_socket();
-      socket.send_to_socket();
+      char server_buf[1024];
+      socket.read_from_socket(server_buf, 1024);
+      socket.send_to_socket(server_buf, 1024);
    }
    return 0;
 }

@@ -18,11 +18,13 @@ int main(int argc, char **argv)
    }
 
    ServerSocket socket(atoi(argv[1]));
+   const int BUF_SIZE = 1024;
 
    while (1)
    {
-      socket.read_from_socket();
-      socket.send_to_socket();
+      char client_buf[BUF_SIZE];
+      socket.read_from_socket(client_buf, BUF_SIZE);
+      socket.send_to_socket(client_buf, BUF_SIZE);
    }
 
    return 0;

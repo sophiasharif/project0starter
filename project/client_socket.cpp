@@ -11,19 +11,19 @@ ClientSocket::ClientSocket(int port, string hostname) : Socket(port)
     }
 }
 
-void ClientSocket::read_from_socket()
+void ClientSocket::read_from_socket(char *buf, size_t length)
 {
-    char server_buf[1024];
+
     socklen_t address_size = sizeof(socklen_t);
-    int bytes_recvd = recvfrom(sockfd, server_buf, BUF_SIZE,
+    int bytes_recvd = recvfrom(sockfd, buf, length,
                                // socket  store data  how much
                                0, (struct sockaddr *)&servaddr,
                                &address_size);
     if (bytes_recvd > 0)
-        write(1, server_buf, bytes_recvd);
+        write(1, buf, bytes_recvd);
 }
 
-void ClientSocket::send_to_socket()
+void ClientSocket::send_to_socket(char *buf, size_t length)
 {
     char client_buf[1024];
 

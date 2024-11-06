@@ -20,21 +20,21 @@ void ServerSocket::bind_socket()
     }
 }
 
-void ServerSocket::read_from_socket()
+void ServerSocket::read_from_socket(char *buf, size_t length)
 {
-    char client_buf[BUF_SIZE];
+
     socklen_t address_size = sizeof(clientaddr);
-    int bytes_recvd = recvfrom(sockfd, client_buf, BUF_SIZE,
+    int bytes_recvd = recvfrom(sockfd, buf, length,
                                0, (struct sockaddr *)&clientaddr,
                                &address_size);
     if (bytes_recvd > 0)
     {
         client_connected = 1;
-        write(1, client_buf, bytes_recvd);
+        write(1, buf, bytes_recvd);
     }
 }
 
-void ServerSocket::send_to_socket()
+void ServerSocket::send_to_socket(char *buf, size_t length)
 {
     if (client_connected)
     {
