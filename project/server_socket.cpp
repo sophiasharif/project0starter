@@ -30,7 +30,6 @@ int ServerSocket::read_from_socket(char *buf, size_t length)
     if (bytes_recvd > 0)
     {
         client_connected = 1;
-        write(1, buf, bytes_recvd);
     }
     return bytes_recvd;
 }
@@ -39,11 +38,11 @@ int ServerSocket::send_to_socket(char *buf, size_t length)
 {
     if (client_connected)
     {
-        char server_buf[BUF_SIZE];
-        int bytes_read = read(0, server_buf, BUF_SIZE);
-        sendto(sockfd, server_buf, bytes_read,
-               0, (struct sockaddr *)&clientaddr,
-               sizeof(clientaddr));
+
+        int did_send = sendto(sockfd, buf, length,
+                              0, (struct sockaddr *)&clientaddr,
+                              sizeof(clientaddr));
+        return did_send;
     }
     return 0;
 }

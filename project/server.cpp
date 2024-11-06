@@ -23,8 +23,13 @@ int main(int argc, char **argv)
    while (1)
    {
       char client_buf[BUF_SIZE];
-      socket.read_from_socket(client_buf, BUF_SIZE);
-      socket.send_to_socket(client_buf, BUF_SIZE);
+      int bytes_recvd = socket.read_from_socket(client_buf, BUF_SIZE);
+      if (bytes_recvd > 0)
+         write(1, client_buf, bytes_recvd);
+
+      char server_buf[BUF_SIZE];
+      int bytes_read = read(0, server_buf, BUF_SIZE);
+      socket.send_to_socket(server_buf, bytes_read);
    }
 
    return 0;
