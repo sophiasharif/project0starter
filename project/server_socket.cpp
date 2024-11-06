@@ -28,9 +28,7 @@ int ServerSocket::read_from_socket(char *buf, size_t length)
                                0, (struct sockaddr *)&clientaddr,
                                &address_size);
     if (bytes_recvd > 0)
-    {
         client_connected = 1;
-    }
     return bytes_recvd;
 }
 

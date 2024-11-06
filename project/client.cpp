@@ -5,6 +5,10 @@
 #include <fcntl.h>
 #include "util.h"
 #include "client_socket.h"
+#include "rdtlayer.h"
+#include <iostream>
+
+using namespace std;
 
 int main(int argc, char **argv)
 {
@@ -14,6 +18,7 @@ int main(int argc, char **argv)
       exit(1);
    }
    ClientSocket socket(atoi(argv[2]), argv[1]);
+   RDTLayer rdt(socket);
 
    while (1)
    {
@@ -24,8 +29,7 @@ int main(int argc, char **argv)
 
       char client_buf[1024];
       int bytes_read = read(0, client_buf, 1024);
-      if (bytes_read > 0)
-         socket.send_to_socket(client_buf, bytes_read);
+      rdt.send_packet(client_buf, bytes_read);
    }
    return 0;
 }
