@@ -11,7 +11,7 @@ ClientSocket::ClientSocket(int port, string hostname) : Socket(port)
     }
 }
 
-void ClientSocket::read_from_socket(char *buf, size_t length)
+int ClientSocket::read_from_socket(char *buf, size_t length)
 {
 
     socklen_t address_size = sizeof(socklen_t);
@@ -21,9 +21,10 @@ void ClientSocket::read_from_socket(char *buf, size_t length)
                                &address_size);
     if (bytes_recvd > 0)
         write(1, buf, bytes_recvd);
+    return bytes_recvd;
 }
 
-void ClientSocket::send_to_socket(char *buf, size_t length)
+int ClientSocket::send_to_socket(char *buf, size_t length)
 {
     char client_buf[1024];
 
@@ -40,4 +41,5 @@ void ClientSocket::send_to_socket(char *buf, size_t length)
             throw runtime_error("Error sending data to server");
         }
     }
+    return 0;
 }
