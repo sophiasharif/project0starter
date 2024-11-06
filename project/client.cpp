@@ -18,8 +18,14 @@ int main(int argc, char **argv)
    while (1)
    {
       char server_buf[1024];
-      socket.read_from_socket(server_buf, 1024);
-      socket.send_to_socket(server_buf, 1024);
+      int bytes_recvd = socket.read_from_socket(server_buf, 1024);
+      if (bytes_recvd > 0)
+         write(1, server_buf, bytes_recvd);
+
+      char client_buf[1024];
+      int bytes_read = read(0, client_buf, 1024);
+      if (bytes_read > 0)
+         socket.send_to_socket(client_buf, bytes_read);
    }
    return 0;
 }
