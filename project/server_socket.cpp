@@ -20,7 +20,7 @@ void ServerSocket::bind_socket()
     }
 }
 
-int ServerSocket::read_from_socket(char *buf, size_t length)
+int ServerSocket::read_from_socket(uint8_t *buf, size_t length)
 {
 
     socklen_t address_size = sizeof(clientaddr);
@@ -32,7 +32,7 @@ int ServerSocket::read_from_socket(char *buf, size_t length)
     return bytes_recvd;
 }
 
-int ServerSocket::send_to_socket(char *buf, size_t length)
+int ServerSocket::send_to_socket(uint8_t *buf, size_t length)
 {
     if (client_connected)
     {

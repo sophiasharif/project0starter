@@ -11,7 +11,7 @@ ClientSocket::ClientSocket(int port, string hostname) : Socket(port)
     }
 }
 
-int ClientSocket::read_from_socket(char *buf, size_t length)
+int ClientSocket::read_from_socket(uint8_t *buf, size_t length)
 {
 
     socklen_t address_size = sizeof(socklen_t);
@@ -22,7 +22,7 @@ int ClientSocket::read_from_socket(char *buf, size_t length)
     return bytes_recvd;
 }
 
-int ClientSocket::send_to_socket(char *buf, size_t length)
+int ClientSocket::send_to_socket(uint8_t *buf, size_t length)
 {
     int did_send = sendto(sockfd, buf, length,
                           // socket  send data   how much to send

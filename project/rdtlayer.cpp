@@ -7,7 +7,7 @@ RDTLayer::RDTLayer(Socket &sock) : sock(sock)
 {
 }
 
-void RDTLayer::send_packet(char *buf, int length)
+void RDTLayer::send_packet(uint8_t *buf, int length, uint32_t ack, uint32_t seq, bool ack_bit, bool syn_bit)
 {
     // if length < 0, don't send anything
     if (length == -1)
@@ -18,10 +18,12 @@ void RDTLayer::send_packet(char *buf, int length)
         cerr << "Packet length exceeds maximum segment size" << endl;
         return;
     }
+
     sock.send_to_socket(buf, length);
 }
 
-void RDTLayer::receive_packet(char *buf, int length)
+int RDTLayer::receive_packet(uint8_t *buf, int buf_size)
 {
-    sock.read_from_socket(buf, length);
+    int bytes_recvd = sock.read_from_socket(buf, buf_size);
+    return bytes_recvd;
 }
