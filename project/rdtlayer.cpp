@@ -34,9 +34,11 @@ void RDTLayer::send_packet(uint8_t *buf, int length, uint32_t ack, uint32_t seq,
     sock.send_to_socket(network_data, packet_length);
 }
 
-int RDTLayer::receive_packet(uint8_t *buf, int buf_size)
+int RDTLayer::receive_packet()
 {
+    // attempt to read from socket
     uint8_t network_data[PACKET_SIZE];
+    // next step: split into multiple packets if necessary ?
     int bytes_recvd = sock.read_from_socket(network_data, PACKET_SIZE);
     if (bytes_recvd > 0)
     {
@@ -53,6 +55,7 @@ int RDTLayer::receive_packet(uint8_t *buf, int buf_size)
 
 int RDTLayer::write_packets()
 {
+    // write any acknowledged packets into stdout
     if (packet_buffer.size() == 0)
         return 0;
     Packet to_write = packet_buffer[0];
