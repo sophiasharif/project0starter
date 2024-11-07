@@ -10,7 +10,18 @@ RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock)
     // pick a random number between 0 and half of max sequence number
     next_expected_byte = rand() % (UINT32_MAX / 2);
     state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
-    handshake();
+    // handshake();
+}
+
+void RDTLayer::start()
+{
+    while (1)
+    {
+        receive_packet();
+        write_packets();
+        read_packet();
+        send_packet();
+    }
 }
 
 void RDTLayer::handshake()

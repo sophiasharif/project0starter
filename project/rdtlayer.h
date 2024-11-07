@@ -33,6 +33,7 @@ public:
     void send_packet();
     int receive_packet();
     int write_packets();
+    void start();
 
 private:
     Socket &sock;

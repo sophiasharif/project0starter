@@ -20,19 +20,7 @@ int main(int argc, char **argv)
    int BUF_SIZE = 1024;
    ClientSocket socket(atoi(argv[2]), argv[1]);
    RDTLayer rdt(socket, CLIENT);
-
-   while (1)
-   {
-      rdt.receive_packet();
-      rdt.write_packets();
-
-      // uint8_t my_buf[BUF_SIZE];
-      // int bytes_read = read(0, my_buf, BUF_SIZE);
-      // if (bytes_read > 0)
-      //    socket.send_to_socket(my_buf, bytes_read);
-      rdt.read_packet();
-      rdt.send_packet();
-   }
+   rdt.start();
    return 0;
 }
 
