@@ -27,9 +27,10 @@ int main(int argc, char **argv)
       int bytes_recvd = rdt.receive_packet(their_buf, BUF_SIZE);
       if (bytes_recvd > 0)
       {
-         cerr << "second write" << endl;
+         // cerr << "second write" << endl;
 
-         write(1, their_buf, bytes_recvd);
+         // write(1, their_buf, bytes_recvd);
+         rdt.write_packets();
       }
 
       uint8_t my_buf[BUF_SIZE];

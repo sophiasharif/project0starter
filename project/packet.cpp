@@ -124,3 +124,16 @@ uint8_t *Packet::get_payload()
 {
     return p.payload;
 }
+
+void Packet::write_packet_to_stderr()
+{
+    cerr << "-- Packet --" << endl;
+    cerr << "   ack: " << p.ack << endl;
+    cerr << "   seq: " << p.seq << endl;
+    cerr << "   length: " << p.length << endl;
+    cerr << "   ACK flag: " << is_ack_set() << endl;
+    cerr << "   SYN flag: " << is_syn_set() << endl;
+    cerr << "   unused: " << p.unused << endl;
+    cerr << "   payload: " << p.payload << endl;
+    cerr << "------------" << endl;
+}

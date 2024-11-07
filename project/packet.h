@@ -25,6 +25,7 @@ public:
     bool is_ack_set();
     bool is_syn_set();
     uint8_t *get_payload();
+    void write_packet_to_stderr();
 
 private:
     packet p;
