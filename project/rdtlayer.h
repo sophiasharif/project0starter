@@ -28,13 +28,15 @@ class RDTLayer
 {
 public:
     RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type);
+    void read_packet();
     void send_packet();
     int receive_packet();
     int write_packets();
 
 private:
     Socket &sock;
-    std::vector<Packet> packet_buffer;
+    std::vector<Packet> sending_buffer;
+    std::vector<Packet> receiving_buffer;
     uint32_t next_expected_byte;
     RDTLAYER_STATE state;
     void handshake();

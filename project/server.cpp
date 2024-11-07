@@ -25,7 +25,7 @@ int main(int argc, char **argv)
    {
       rdt.receive_packet();
       rdt.write_packets();
-
+      rdt.read_packet();
       rdt.send_packet();
    }
 
