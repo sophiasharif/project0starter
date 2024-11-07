@@ -1,8 +1,11 @@
 #include "packet.h"
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
+
+#define HEADER_SIZE (sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t) + sizeof(uint8_t) + sizeof(uint8_t))
 
 Packet::Packet(uint32_t ack, uint32_t seq, uint16_t length, bool ack_bit, bool syn_bit, uint8_t *payload)
 {
@@ -13,25 +16,90 @@ Packet::Packet(uint32_t ack, uint32_t seq, uint16_t length, bool ack_bit, bool s
     memcpy(p.payload, payload, min(length, static_cast<uint16_t>(MSS)));
 }
 
-Packet::Packet(packet network_packet)
+Packet::Packet(uint8_t network_data[], unsigned long data_length)
 {
-    p.ack = ntohl(network_packet.ack);
-    p.seq = ntohl(network_packet.seq);
-    p.length = ntohs(network_packet.length);
-    p.flags = network_packet.flags;
-    memcpy(p.payload, network_packet.payload, min(p.length, static_cast<uint16_t>(MSS)));
+    const uint8_t *ptr = network_data;
+
+    if (data_length < HEADER_SIZE)
+    {
+        throw std::runtime_error("Data length is too short to form a valid packet");
+    }
+
+    // Read ack number (uint32_t)
+    uint32_t net_ack;
+    memcpy(&net_ack, ptr, sizeof(uint32_t));
+    p.ack = ntohl(net_ack);
+    ptr += sizeof(uint32_t);
+
+    // Read seq number (uint32_t)
+    uint32_t net_seq;
+    memcpy(&net_seq, ptr, sizeof(uint32_t));
+    p.seq = ntohl(net_seq);
+    ptr += sizeof(uint32_t);
+
+    // Read length (uint16_t)
+    uint16_t net_length;
+    memcpy(&net_length, ptr, sizeof(uint16_t));
+    p.length = ntohs(net_length);
+    ptr += sizeof(uint16_t);
+
+    // Read flags (uint8_t)
+    p.flags = *ptr;
+    ptr += sizeof(uint8_t);
+
+    // Read unused (uint8_t)
+    p.unused = *ptr;
+    ptr += sizeof(uint8_t);
+
+    // Calculate payload length
+    size_t payload_length = data_length - HEADER_SIZE;
+    if (payload_length > MSS || p.length > MSS)
+    {
+        cerr << "Computed payload length: " << payload_length << endl;
+        cerr << "Packet length: " << p.length << endl;
+        throw std::runtime_error("Invalid payload length");
+    }
+
+    // Copy payload
+    memcpy(p.payload, ptr, payload_length);
 }
 
-packet Packet::to_network_packet()
+int Packet::to_network_data(uint8_t network_data[])
 {
-    packet network_packet;
-    network_packet.ack = htonl(p.ack);
-    network_packet.seq = htonl(p.seq);
-    network_packet.length = htons(p.length);
-    network_packet.flags = p.flags;
-    memcpy(network_packet.payload, p.payload, min(p.length, static_cast<uint16_t>(MSS)));
-    return network_packet;
+    uint8_t *ptr = network_data;
+
+    // Write ack number (convert to network byte order)
+    uint32_t net_ack = htonl(p.ack);
+    memcpy(ptr, &net_ack, sizeof(uint32_t));
+    ptr += sizeof(uint32_t);
+
+    // Write seq number (convert to network byte order)
+    uint32_t net_seq = htonl(p.seq);
+    memcpy(ptr, &net_seq, sizeof(uint32_t));
+    ptr += sizeof(uint32_t);
+
+    // Write length (convert to network byte order)
+    uint16_t net_length = htons(p.length);
+    memcpy(ptr, &net_length, sizeof(uint16_t));
+    ptr += sizeof(uint16_t);
+
+    // Write flags
+    *ptr = p.flags;
+    ptr += sizeof(uint8_t);
+
+    // Write unused field
+    *ptr = p.unused;
+    ptr += sizeof(uint8_t);
+
+    // Write payload (ensure not to exceed `p.length` or MSS)
+    uint16_t payload_length = std::min(p.length, static_cast<uint16_t>(MSS));
+    memcpy(ptr, p.payload, payload_length);
+    ptr += payload_length;
+
+    // Return total packet length for use in send_to_socket
+    return ptr - network_data;
 }
+
 uint32_t Packet::get_ack()
 {
     return p.ack;

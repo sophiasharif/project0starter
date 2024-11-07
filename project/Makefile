@@ -7,8 +7,8 @@ all: clean build
 default: build
 
 build: server.cpp client.cpp util.cpp socket.cpp server_socket.cpp
-	${CC} -o server server.cpp util.cpp socket.cpp server_socket.cpp rdtlayer.cpp ${CFLAGS}
-	${CC} -o client client.cpp util.cpp socket.cpp client_socket.cpp rdtlayer.cpp ${CFLAGS}
+	${CC} -o server server.cpp util.cpp socket.cpp server_socket.cpp rdtlayer.cpp packet.cpp ${CFLAGS}
+	${CC} -o client client.cpp util.cpp socket.cpp client_socket.cpp rdtlayer.cpp packet.cpp ${CFLAGS}
 
 clean:
 	rm -rf server client *.bin *.out *.dSYM

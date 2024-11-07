@@ -17,8 +17,8 @@ class Packet
 {
 public:
     Packet(uint32_t ack, uint32_t seq, uint16_t length, bool ack_bit, bool syn_bit, uint8_t *payload);
-    Packet(packet network_packet);
-    packet to_network_packet();
+    Packet(uint8_t network_data[], unsigned long data_length);
+    int to_network_data(uint8_t network_data[]);
     uint32_t get_ack();
     uint32_t get_seq();
     uint16_t get_length();

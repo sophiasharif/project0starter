@@ -4,6 +4,8 @@
 #include "socket.h"
 #include "packet.h"
 
+#define PACKET_SIZE sizeof(packet)
+
 class RDTLayer
 {
 public:

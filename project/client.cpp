@@ -1,4 +1,3 @@
-#include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <openssl/evp.h>
@@ -27,7 +26,11 @@ int main(int argc, char **argv)
       uint8_t their_buf[BUF_SIZE];
       int bytes_recvd = rdt.receive_packet(their_buf, BUF_SIZE);
       if (bytes_recvd > 0)
+      {
+         cerr << "second write" << endl;
+
          write(1, their_buf, bytes_recvd);
+      }
 
       uint8_t my_buf[BUF_SIZE];
       int bytes_read = read(0, my_buf, BUF_SIZE);
