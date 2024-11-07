@@ -46,7 +46,7 @@ void RDTLayer::create_packet_from_input()
     }
 
     Packet p(0, seq, length, false, false, buf);
-    seq += length;
+    seq += p.get_packet_size();
     add_packet_to_sending_buffer(p);
 }
 
@@ -98,7 +98,7 @@ int RDTLayer::write_packets()
     sort(receiving_buffer.begin(), receiving_buffer.end());
 
     int packets_written = 0;
-    for (auto it = receiving_buffer.begin(); it != receiving_buffer.end();)
+    for (vector<Packet>::iterator it = receiving_buffer.begin(); it != receiving_buffer.end();)
     {
         Packet p = *it;
         if (p.get_seq() < next_byte_to_receive)

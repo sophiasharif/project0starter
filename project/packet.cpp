@@ -124,6 +124,10 @@ uint8_t *Packet::get_payload()
 {
     return p.payload;
 }
+uint16_t Packet::get_packet_size() const
+{
+    return HEADER_SIZE + p.length;
+}
 
 void Packet::write_packet_to_stderr()
 {
@@ -135,7 +139,7 @@ void Packet::write_packet_to_stderr()
     cerr << "   SYN flag: " << is_syn_set() << endl;
     cerr << "   unused: " << p.unused << endl;
     cerr << "   payload: " << endl
-         << "   ";
+         << "      ";
     for (int i = 0; i < p.length; i++)
     {
         cerr << p.payload[i];

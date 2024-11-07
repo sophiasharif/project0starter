@@ -22,6 +22,7 @@ public:
     uint32_t get_ack() const;
     uint32_t get_seq() const;
     uint16_t get_length() const;
+    uint16_t get_packet_size() const;
     bool is_ack_set() const;
     bool is_syn_set() const;
     uint8_t *get_payload();
