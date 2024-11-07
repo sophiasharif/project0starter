@@ -17,19 +17,21 @@ int main(int argc, char **argv)
       printf("Usage: %s <hostname> <port>\n", argv[0]);
       exit(1);
    }
+
+   int BUF_SIZE = 1024;
    ClientSocket socket(atoi(argv[2]), argv[1]);
    RDTLayer rdt(socket);
 
    while (1)
    {
-      uint8_t server_buf[1024];
-      int bytes_recvd = rdt.receive_packet(server_buf, 1024);
+      uint8_t their_buf[BUF_SIZE];
+      int bytes_recvd = rdt.receive_packet(their_buf, BUF_SIZE);
       if (bytes_recvd > 0)
-         write(1, server_buf, bytes_recvd);
+         write(1, their_buf, bytes_recvd);
 
-      uint8_t client_buf[1024];
-      int bytes_read = read(0, client_buf, 1024);
-      rdt.send_packet(client_buf, bytes_read, 0, 0, false, false);
+      uint8_t my_buf[BUF_SIZE];
+      int bytes_read = read(0, my_buf, BUF_SIZE);
+      rdt.send_packet(my_buf, bytes_read, 0, 0, false, false);
    }
    return 0;
 }
