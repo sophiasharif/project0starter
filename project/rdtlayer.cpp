@@ -5,10 +5,33 @@
 
 using namespace std;
 
-RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock), receiver_type(receiver_type)
+RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock)
 {
     // pick a random number between 0 and half of max sequence number
     next_expected_byte = rand() % (UINT32_MAX / 2);
+    state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
+    handshake();
+}
+
+void RDTLayer::handshake()
+{
+    while (state != CONNECTED)
+    {
+        switch (state)
+        {
+        case CONNECTED:
+        {
+            cerr << "Connected" << endl;
+            break;
+        }
+        default:
+        {
+            cerr << "Default" << endl;
+            state = CONNECTED;
+            break;
+        }
+        }
+    }
 }
 
 void RDTLayer::send_packet()

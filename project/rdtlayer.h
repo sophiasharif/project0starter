@@ -13,6 +13,17 @@ enum RECEIVER_TYPE
     SERVER
 };
 
+enum RDTLAYER_STATE
+{
+    CLIENT_START,
+    CLIENT_AWAIT,
+    CLIENT_AWAIT_2,
+    SERVER_START,
+    SERVER_SYN,
+    SERVER_AWAIT_2,
+    CONNECTED
+};
+
 class RDTLayer
 {
 public:
@@ -25,7 +36,8 @@ private:
     Socket &sock;
     std::vector<Packet> packet_buffer;
     uint32_t next_expected_byte;
-    RECEIVER_TYPE receiver_type;
+    RDTLAYER_STATE state;
+    void handshake();
 };
 
 #endif
