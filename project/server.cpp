@@ -24,13 +24,13 @@ int main(int argc, char **argv)
 
    while (1)
    {
-      uint8_t their_buf[BUF_SIZE];
-      int bytes_recvd = socket.read_from_socket(their_buf, BUF_SIZE);
-      if (bytes_recvd > 0)
-         write(1, their_buf, bytes_recvd);
+      // uint8_t their_buf[BUF_SIZE];
+      // int bytes_recvd = socket.read_from_socket(their_buf, BUF_SIZE);
+      // if (bytes_recvd > 0)
+      //    write(1, their_buf, bytes_recvd);
+      rdt.receive_packet();
+      rdt.write_packets();
 
-      // uint8_t my_buf[BUF_SIZE];
-      // int bytes_read = read(0, my_buf, BUF_SIZE);
       rdt.send_packet();
    }
 

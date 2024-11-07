@@ -26,10 +26,11 @@ int main(int argc, char **argv)
       rdt.receive_packet();
       rdt.write_packets();
 
-      uint8_t my_buf[BUF_SIZE];
-      int bytes_read = read(0, my_buf, BUF_SIZE);
-      if (bytes_read > 0)
-         socket.send_to_socket(my_buf, bytes_read);
+      // uint8_t my_buf[BUF_SIZE];
+      // int bytes_read = read(0, my_buf, BUF_SIZE);
+      // if (bytes_read > 0)
+      //    socket.send_to_socket(my_buf, bytes_read);
+      rdt.send_packet();
    }
    return 0;
 }
