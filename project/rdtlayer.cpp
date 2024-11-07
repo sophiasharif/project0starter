@@ -19,33 +19,12 @@ void RDTLayer::start()
     {
         receive_packet();
         write_packets();
-        read_packet();
+        create_packet_from_input();
         send_packet();
     }
 }
 
-void RDTLayer::handshake()
-{
-    while (state != CONNECTED)
-    {
-        switch (state)
-        {
-        case CONNECTED:
-        {
-            cerr << "Connected" << endl;
-            break;
-        }
-        default:
-        {
-            cerr << "Default" << endl;
-            state = CONNECTED;
-            break;
-        }
-        }
-    }
-}
-
-void RDTLayer::read_packet()
+void RDTLayer::create_packet_from_input()
 {
     uint8_t buf[MSS];
     int length = read(0, buf, MSS);

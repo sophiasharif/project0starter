@@ -29,7 +29,7 @@ class RDTLayer
 {
 public:
     RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type);
-    void read_packet();
+    void create_packet_from_input();
     void send_packet();
     int receive_packet();
     int write_packets();
