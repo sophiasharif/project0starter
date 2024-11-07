@@ -31,7 +31,8 @@ int main(int argc, char **argv)
 
       uint8_t my_buf[BUF_SIZE];
       int bytes_read = read(0, my_buf, BUF_SIZE);
-      rdt.send_packet(my_buf, bytes_read, 0, 0, false, false);
+      if (bytes_read > 0)
+         socket.send_to_socket(my_buf, bytes_read);
    }
    return 0;
 }
