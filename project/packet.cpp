@@ -100,23 +100,23 @@ int Packet::to_network_data(uint8_t network_data[])
     return ptr - network_data;
 }
 
-uint32_t Packet::get_ack()
+uint32_t Packet::get_ack() const
 {
     return p.ack;
 }
-uint32_t Packet::get_seq()
+uint32_t Packet::get_seq() const
 {
     return p.seq;
 }
-uint16_t Packet::get_length()
+uint16_t Packet::get_length() const
 {
     return p.length;
 }
-bool Packet::is_ack_set()
+bool Packet::is_ack_set() const
 {
     return p.flags & 0x2;
 }
-bool Packet::is_syn_set()
+bool Packet::is_syn_set() const
 {
     return p.flags & 0x1;
 }

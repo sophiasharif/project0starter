@@ -19,13 +19,17 @@ public:
     Packet(uint32_t ack, uint32_t seq, uint16_t length, bool ack_bit, bool syn_bit, uint8_t *payload);
     Packet(uint8_t network_data[], unsigned long data_length);
     int to_network_data(uint8_t network_data[]);
-    uint32_t get_ack();
-    uint32_t get_seq();
-    uint16_t get_length();
-    bool is_ack_set();
-    bool is_syn_set();
+    uint32_t get_ack() const;
+    uint32_t get_seq() const;
+    uint16_t get_length() const;
+    bool is_ack_set() const;
+    bool is_syn_set() const;
     uint8_t *get_payload();
     void write_packet_to_stderr();
+    bool operator<(const Packet &other) const
+    {
+        return get_seq() < other.get_seq();
+    }
 
 private:
     packet p;

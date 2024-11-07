@@ -39,9 +39,10 @@ private:
     Socket &sock;
     std::vector<Packet> sending_buffer;
     std::vector<Packet> receiving_buffer;
-    uint32_t next_expected_byte;
+    uint32_t next_byte_to_receive; // my ack number that I'm sending
+    uint32_t next_byte_to_send;    // last ack number I received
+    uint32_t seq;                  // next byte to add to sending buffer
     RDTLAYER_STATE state;
-    void handshake();
     void add_packet_to_sending_buffer(Packet p);
 };
 

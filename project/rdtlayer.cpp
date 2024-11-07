@@ -8,7 +8,11 @@ using namespace std;
 RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock)
 {
     // pick a random number between 0 and half of max sequence number
-    next_expected_byte = rand() % (UINT32_MAX / 2);
+    srand(static_cast<unsigned int>(time(nullptr)));
+    seq = rand() % (UINT32_MAX / 2);
+    cerr << "Initial sequence number: " << std::dec << seq << endl;
+    next_byte_to_send = seq;
+    next_byte_to_receive = UINT32_MAX;
     state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
     // handshake();
 }
@@ -26,6 +30,9 @@ void RDTLayer::start()
 
 void RDTLayer::create_packet_from_input()
 {
+    if (sending_buffer.size() == MAX_BUFFER_SIZE)
+        return; // buffer is full; don't read from stdin
+
     uint8_t buf[MSS];
     int length = read(0, buf, MSS);
     // if length < 0, don't send anything
@@ -38,20 +45,21 @@ void RDTLayer::create_packet_from_input()
         return;
     }
 
-    Packet p(0, 0, length, false, false, buf);
+    Packet p(0, seq, length, false, false, buf);
+    seq += length;
     add_packet_to_sending_buffer(p);
 }
 
 void RDTLayer::add_packet_to_sending_buffer(Packet p)
 {
-    if (sending_buffer.size() <= MAX_BUFFER_SIZE)
+    if (sending_buffer.size() >= MAX_BUFFER_SIZE)
     {
-        sending_buffer.push_back(p);
+        cerr << "attempting to add packet to sending full buffer" << endl;
+        cerr << "buffer size: " << sending_buffer.size() << endl;
+        throw std::runtime_error("Buffer is full");
     }
-    else
-    {
-        cerr << "Sending buffer is full" << endl;
-    }
+
+    sending_buffer.push_back(p);
 }
 
 void RDTLayer::send_packet()
@@ -62,14 +70,8 @@ void RDTLayer::send_packet()
     sending_buffer.erase(sending_buffer.begin());
     uint8_t network_data[PACKET_SIZE];
     int packet_length = to_send.to_network_data(network_data);
-    // cerr << " --- Sending packet ---" << endl;
-    // cerr << "ack: " << network_data[0] << network_data[1] << network_data[2] << network_data[3] << endl;
-    // cerr << "seq: " << network_data[4] << network_data[5] << network_data[6] << network_data[7] << endl;
-    // cerr << "length: " << network_data[8] << network_data[9] << endl;
-    // cerr << "flags: " << network_data[10] << endl;
-    // cerr << "unused: " << network_data[11] << endl;
-    // cerr << "payload: " << network_data[12] << network_data[13] << network_data[14] << network_data[15] << endl;
-    // cerr << "-----------------------" << endl;
+    cerr << "SENDING PACKET: " << endl;
+    to_send.write_packet_to_stderr();
     sock.send_to_socket(network_data, packet_length);
 }
 
@@ -81,12 +83,10 @@ int RDTLayer::receive_packet()
     int bytes_recvd = sock.read_from_socket(network_data, PACKET_SIZE);
     if (bytes_recvd > 0)
     {
-        // cerr << "--- Received packet ---" << endl;
-        // cerr << "Bytes received: " << bytes_recvd << endl;
-        // cerr << "Payload: " << network_data << endl;
-        // cerr << "-----------------------" << endl;
         Packet p(network_data, bytes_recvd);
-        // p.write_packet_to_stderr();
+        cerr << "RECEIVED PACKET: " << endl;
+        cerr << "bytes recieved: " << bytes_recvd << endl;
+        p.write_packet_to_stderr();
         receiving_buffer.push_back(p);
     }
     return bytes_recvd;
@@ -94,11 +94,32 @@ int RDTLayer::receive_packet()
 
 int RDTLayer::write_packets()
 {
-    // write any acknowledged packets into stdout
-    if (receiving_buffer.size() == 0)
-        return 0;
-    Packet to_write = receiving_buffer[0];
-    receiving_buffer.erase(receiving_buffer.begin());
-    write(1, to_write.get_payload(), to_write.get_length());
-    return 1;
+    // write all packets with seq < next_byte_to_receive
+    sort(receiving_buffer.begin(), receiving_buffer.end());
+
+    int packets_written = 0;
+    for (auto it = receiving_buffer.begin(); it != receiving_buffer.end();)
+    {
+        Packet p = *it;
+        if (p.get_seq() < next_byte_to_receive)
+        {
+            write(1, p.get_payload(), p.get_length());
+            it = receiving_buffer.erase(it);
+            packets_written++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    if (packets_written > 0)
+        cerr << "Packets written: " << packets_written << endl;
+    return packets_written;
+
+    // if (receiving_buffer.size() == 0)
+    //     return 0;
+    // Packet to_write = receiving_buffer[0];
+    // receiving_buffer.erase(receiving_buffer.begin());
+    // write(1, to_write.get_payload(), to_write.get_length());
+    // return 1;
 }
