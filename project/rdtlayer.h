@@ -32,7 +32,6 @@ public:
     void create_packet_from_input();
     void send_packet();
     int receive_packet();
-    int write_packets();
     void start();
 
 private:
@@ -44,6 +43,9 @@ private:
     uint32_t seq;                  // next byte to add to sending buffer
     RDTLAYER_STATE state;
     void add_packet_to_sending_buffer(Packet p);
+    void add_packet_to_receiving_buffer(Packet p);
+    void update_sending_buffer(uint32_t ack_number);
+    void update_receiving_buffer();
 };
 
 #endif
