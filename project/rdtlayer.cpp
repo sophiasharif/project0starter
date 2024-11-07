@@ -9,8 +9,10 @@ RDTLayer::RDTLayer(Socket &sock) : sock(sock)
 {
 }
 
-void RDTLayer::send_packet(uint8_t *buf, int length, uint32_t ack, uint32_t seq, bool ack_bit, bool syn_bit)
+void RDTLayer::send_packet()
 {
+    uint8_t buf[MSS];
+    int length = read(0, buf, MSS);
     // if length < 0, don't send anything
     if (length == -1)
         return;
@@ -21,16 +23,20 @@ void RDTLayer::send_packet(uint8_t *buf, int length, uint32_t ack, uint32_t seq,
         return;
     }
 
+    Packet p(0, 0, length, false, false, buf);
     uint8_t network_data[PACKET_SIZE];
-    Packet p(ack, seq, length, ack_bit, syn_bit, buf);
     int packet_length = p.to_network_data(network_data);
-    // cerr << "Packet length: " << packet_length << endl;
-    // cerr << "ack: " << network_data[0] << network_data[1] << network_data[2] << network_data[3] << endl;
-    // cerr << "seq: " << network_data[4] << network_data[5] << network_data[6] << network_data[7] << endl;
-    // cerr << "length: " << network_data[8] << network_data[9] << endl;
-    // cerr << "flags: " << network_data[10] << endl;
-    // cerr << "unused: " << network_data[11] << endl;
-    // cerr << "payload: " << network_data[12] << network_data[13] << network_data[14] << network_data[15] << endl;
+    cerr << " --- Sending packet ---" << endl;
+    cerr << "Read " << length << " bytes from stdin" << endl;
+    cerr << "Payload: " << buf << endl;
+    cerr << "Packet length: " << packet_length << endl;
+    cerr << "ack: " << network_data[0] << network_data[1] << network_data[2] << network_data[3] << endl;
+    cerr << "seq: " << network_data[4] << network_data[5] << network_data[6] << network_data[7] << endl;
+    cerr << "length: " << network_data[8] << network_data[9] << endl;
+    cerr << "flags: " << network_data[10] << endl;
+    cerr << "unused: " << network_data[11] << endl;
+    cerr << "payload: " << network_data[12] << network_data[13] << network_data[14] << network_data[15] << endl;
+    cerr << "-----------------------" << endl;
     sock.send_to_socket(network_data, packet_length);
 }
 

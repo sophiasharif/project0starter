@@ -134,6 +134,11 @@ void Packet::write_packet_to_stderr()
     cerr << "   ACK flag: " << is_ack_set() << endl;
     cerr << "   SYN flag: " << is_syn_set() << endl;
     cerr << "   unused: " << p.unused << endl;
-    cerr << "   payload: " << p.payload << endl;
+    cerr << "   payload: " << endl
+         << "   ";
+    for (int i = 0; i < p.length; i++)
+    {
+        cerr << p.payload[i];
+    }
     cerr << "------------" << endl;
 }

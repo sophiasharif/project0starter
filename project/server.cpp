@@ -29,9 +29,9 @@ int main(int argc, char **argv)
       if (bytes_recvd > 0)
          write(1, their_buf, bytes_recvd);
 
-      uint8_t my_buf[BUF_SIZE];
-      int bytes_read = read(0, my_buf, BUF_SIZE);
-      rdt.send_packet(my_buf, bytes_read, 0, 0, false, false);
+      // uint8_t my_buf[BUF_SIZE];
+      // int bytes_read = read(0, my_buf, BUF_SIZE);
+      rdt.send_packet();
    }
 
    return 0;

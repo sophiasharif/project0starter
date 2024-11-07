@@ -11,7 +11,7 @@ class RDTLayer
 {
 public:
     RDTLayer(Socket &sock);
-    void send_packet(uint8_t *buf, int length, uint32_t ack, uint32_t seq, bool ack_bit, bool syn_bit);
+    void send_packet();
     int receive_packet();
     int write_packets();
 
