@@ -49,7 +49,19 @@ void RDTLayer::read_packet()
     }
 
     Packet p(0, 0, length, false, false, buf);
-    sending_buffer.push_back(p);
+    add_packet_to_sending_buffer(p);
+}
+
+void RDTLayer::add_packet_to_sending_buffer(Packet p)
+{
+    if (sending_buffer.size() <= MAX_BUFFER_SIZE)
+    {
+        sending_buffer.push_back(p);
+    }
+    else
+    {
+        cerr << "Sending buffer is full" << endl;
+    }
 }
 
 void RDTLayer::send_packet()

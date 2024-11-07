@@ -6,6 +6,7 @@
 #include <vector>
 
 #define PACKET_SIZE sizeof(packet)
+#define MAX_BUFFER_SIZE 20
 
 enum RECEIVER_TYPE
 {
@@ -40,6 +41,7 @@ private:
     uint32_t next_expected_byte;
     RDTLAYER_STATE state;
     void handshake();
+    void add_packet_to_sending_buffer(Packet p);
 };
 
 #endif
