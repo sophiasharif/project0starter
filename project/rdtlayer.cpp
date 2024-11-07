@@ -5,8 +5,10 @@
 
 using namespace std;
 
-RDTLayer::RDTLayer(Socket &sock) : sock(sock)
+RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock), receiver_type(receiver_type)
 {
+    // pick a random number between 0 and half of max sequence number
+    next_expected_byte = rand() % (UINT32_MAX / 2);
 }
 
 void RDTLayer::send_packet()

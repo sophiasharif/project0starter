@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
    int BUF_SIZE = 1024;
    ClientSocket socket(atoi(argv[2]), argv[1]);
-   RDTLayer rdt(socket);
+   RDTLayer rdt(socket, CLIENT);
 
    while (1)
    {

@@ -19,15 +19,10 @@ int main(int argc, char **argv)
    }
 
    ServerSocket socket(atoi(argv[1]));
-   RDTLayer rdt(socket);
-   int BUF_SIZE = 1024;
+   RDTLayer rdt(socket, SERVER);
 
    while (1)
    {
-      // uint8_t their_buf[BUF_SIZE];
-      // int bytes_recvd = socket.read_from_socket(their_buf, BUF_SIZE);
-      // if (bytes_recvd > 0)
-      //    write(1, their_buf, bytes_recvd);
       rdt.receive_packet();
       rdt.write_packets();
 
