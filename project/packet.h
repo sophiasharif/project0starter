@@ -31,6 +31,11 @@ public:
     {
         return get_seq() < other.get_seq();
     }
+    void set_ack(uint32_t ack)
+    {
+        p.flags |= 0x2;
+        p.ack = ack;
+    }
 
 private:
     packet p;

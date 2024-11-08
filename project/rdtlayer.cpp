@@ -86,29 +86,33 @@ void RDTLayer::add_packet_to_receiving_buffer(Packet p)
 void RDTLayer::send_packet()
 {
     uint8_t network_data[PACKET_SIZE];
-    int packet_length;
+    int packet_length = 0;
 
     // if no packets, just send an ack
-    if (sending_buffer.size() == 0)
-    {
-        // WHAT SHOULD SEQ BE?
-        Packet ack_packet(next_byte_to_receive, seq, 0, true, false, nullptr);
-        packet_length = ack_packet.to_network_data(network_data);
-        cerr << "SENDING DEDICATED ACK PACKET: " << endl;
-        ack_packet.write_packet_to_stderr();
-    }
-
-    // send the first packet in the buffer
-    else
+    // TODO: don't send ack if the other side is already all updated
+    if (!sending_buffer.empty())
     {
         Packet to_send = sending_buffer[0];
         sending_buffer.erase(sending_buffer.begin());
+        to_send.set_ack(next_byte_to_receive);
         packet_length = to_send.to_network_data(network_data);
         cerr << "SENDING NORMAL PACKET: " << endl;
         to_send.write_packet_to_stderr();
+        cerr << "sending buffer size: " << sending_buffer.size() << endl;
     }
 
-    sock.send_to_socket(network_data, packet_length);
+    // else
+    // { // send dedicated ack packet
+    //     // WHAT SHOULD SEQ BE?
+    //     Packet ack_packet(next_byte_to_receive, seq, 0, true, false, nullptr);
+    //     packet_length = ack_packet.to_network_data(network_data);
+    //     cerr << "SENDING DEDICATED ACK PACKET: " << endl;
+    //     ack_packet.write_packet_to_stderr();
+    // }
+
+    // send the packet if it was created
+    if (packet_length > 0)
+        sock.send_to_socket(network_data, packet_length);
 }
 
 int RDTLayer::receive_packet()
