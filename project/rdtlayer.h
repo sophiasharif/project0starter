@@ -31,7 +31,7 @@ public:
     RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type);
     void create_packet_from_input();
     void send_packet();
-    int receive_packet();
+    void receive_packet();
     void start();
 
 private:
@@ -46,6 +46,7 @@ private:
     void add_packet_to_receiving_buffer(Packet p);
     void update_sending_buffer(uint32_t ack_number);
     void update_receiving_buffer();
+    bool ack_needed;
 };
 
 #endif

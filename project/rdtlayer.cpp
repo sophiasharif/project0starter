@@ -2,10 +2,11 @@
 #include <iostream>
 #include "packet.h"
 #include <unistd.h>
+#include <algorithm>
 
 using namespace std;
 
-RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock)
+RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock), ack_needed(false)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
@@ -26,7 +27,7 @@ void RDTLayer::start()
     while (1)
     {
         receive_packet();
-        // update_receiving_buffer();
+        update_receiving_buffer();
         create_packet_from_input();
         send_packet();
     }
@@ -34,6 +35,9 @@ void RDTLayer::start()
 
 void RDTLayer::create_packet_from_input()
 {
+    // read from stdin and create a packet
+    // add packet to sending buffer
+
     if (sending_buffer.size() == MAX_BUFFER_SIZE)
         return; // buffer is full; don't read from stdin
 
@@ -85,6 +89,8 @@ void RDTLayer::add_packet_to_receiving_buffer(Packet p)
 
 void RDTLayer::send_packet()
 {
+    // send the first packet in the sending buffer
+
     uint8_t network_data[PACKET_SIZE];
     int packet_length = 0;
 
@@ -93,35 +99,37 @@ void RDTLayer::send_packet()
     if (!sending_buffer.empty())
     {
         Packet to_send = sending_buffer[0];
-        sending_buffer.erase(sending_buffer.begin());
         to_send.set_ack(next_byte_to_receive);
         packet_length = to_send.to_network_data(network_data);
+        sock.send_to_socket(network_data, packet_length);
+        sending_buffer.erase(sending_buffer.begin());
         cerr << "SENDING NORMAL PACKET: " << endl;
         to_send.write_packet_to_stderr();
         cerr << "sending buffer size: " << sending_buffer.size() << endl;
     }
 
-    // else
-    // { // send dedicated ack packet
-    //     // WHAT SHOULD SEQ BE?
-    //     Packet ack_packet(next_byte_to_receive, seq, 0, true, false, nullptr);
-    //     packet_length = ack_packet.to_network_data(network_data);
-    //     cerr << "SENDING DEDICATED ACK PACKET: " << endl;
-    //     ack_packet.write_packet_to_stderr();
-    // }
-
-    // send the packet if it was created
-    if (packet_length > 0)
+    else if (ack_needed)
+    {
+        Packet ack_packet(next_byte_to_receive, seq, 0, true, false, nullptr);
+        packet_length = ack_packet.to_network_data(network_data);
         sock.send_to_socket(network_data, packet_length);
+        cerr << "SENDING ACK PACKET: " << endl;
+        ack_packet.write_packet_to_stderr();
+        ack_needed = false;
+    }
 }
 
-int RDTLayer::receive_packet()
+void RDTLayer::receive_packet()
 {
-    // attempt to read from socket
+
+    // read packet from stdin
+    // update the sending buffer with the ack number
+    // add packet to receiving buffer
+
     if (receiving_buffer.size() >= MAX_BUFFER_SIZE)
     {
         cerr << "Receiving buffer is full; not reading from socket" << endl;
-        return 0;
+        return;
     }
 
     uint8_t network_data[PACKET_SIZE];
@@ -129,6 +137,14 @@ int RDTLayer::receive_packet()
     if (bytes_recvd > 0)
     {
         Packet p(network_data, bytes_recvd);
+
+        // don't add to receiving buffer if it's already there
+        for (vector<Packet>::iterator it = receiving_buffer.begin(); it != receiving_buffer.end(); it++)
+        {
+            if (it->get_seq() == p.get_seq())
+                return;
+        }
+
         cerr << "RECEIVED PACKET: " << endl;
         cerr << "bytes recieved: " << bytes_recvd << endl;
         p.write_packet_to_stderr();
@@ -136,14 +152,13 @@ int RDTLayer::receive_packet()
         if (p.is_ack_set())
             update_sending_buffer(p.get_ack());
         add_packet_to_receiving_buffer(p);
-        update_receiving_buffer();
     }
-    return bytes_recvd;
 }
 
 void RDTLayer::update_receiving_buffer()
 {
-    // write all packets with seq < next_byte_to_receive
+    // write all packets in order to stdout
+
     sort(receiving_buffer.begin(), receiving_buffer.end());
 
     int packets_written = 0;
@@ -155,6 +170,7 @@ void RDTLayer::update_receiving_buffer()
             write(1, p.get_payload(), p.get_length());
             it = receiving_buffer.erase(it);
             next_byte_to_receive += p.get_packet_size();
+            ack_needed = true;
             packets_written++;
         }
         else
