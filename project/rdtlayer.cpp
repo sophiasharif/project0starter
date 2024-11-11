@@ -230,6 +230,7 @@ void RDTLayer::receive_packet()
         if (p.is_ack_set())
             update_sending_buffer(p.get_ack());
         add_packet_to_receiving_buffer(p);
+        ack_needed = true;
         cerr << "receiving buffer size: " << receiving_buffer.size() << endl;
     }
 }
