@@ -9,27 +9,102 @@ using namespace std;
 RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock), ack_needed(false)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
-
-    // seq = rand() % (UINT32_MAX / 2);
-    // next_byte_to_receive = UINT32_MAX;
-    seq = 0;
-    next_byte_to_receive = 0;
+    seq = rand() % (UINT32_MAX / 2);
+    // seq = 0;
+    next_byte_to_send = seq;
+    state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
 
     cerr << "Initial sequence number: " << std::dec << seq << endl;
-    next_byte_to_send = seq;
-    cerr << "Initial next_byte_to_send: " << std::dec << next_byte_to_send << endl;
-    state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
-    // handshake();
 }
 
 void RDTLayer::start()
 {
     while (1)
     {
-        receive_packet();
-        update_receiving_buffer();
-        create_packet_from_input();
-        send_packet();
+        switch (state)
+        {
+        case CLIENT_START:
+        {
+            Packet syn_packet(0, seq, 0, false, true, nullptr);
+            add_packet_to_sending_buffer(syn_packet);
+            send_packet();
+            state = CLIENT_AWAIT;
+            break;
+        }
+        case SERVER_START:
+        {
+            // wait for syn packet
+            while (1)
+            {
+                receive_packet();
+                if (!receiving_buffer.empty())
+                    break;
+            }
+            cerr << "SYN ACK" << endl;
+            Packet syn_packet = receiving_buffer[0];
+            receiving_buffer.clear();
+            next_byte_to_receive = syn_packet.get_seq() + 1;
+
+            // send syn ack
+            Packet syn_ack_packet(next_byte_to_receive, seq, 0, true, true, nullptr);
+            add_packet_to_sending_buffer(syn_ack_packet);
+            send_packet();
+            cerr << "sent syn ack" << endl;
+            cerr << "state = CONNECTED" << endl;
+            state = CONNECTED;
+            break;
+        }
+        case CLIENT_AWAIT:
+        {
+            // wait for syn ack
+            while (1)
+            {
+                receive_packet();
+                if (!receiving_buffer.empty())
+                    break;
+            }
+            cerr << "RECEIVED SYN ACK" << endl;
+            Packet syn_ack_packet = receiving_buffer[0];
+            receiving_buffer.clear();
+            next_byte_to_receive = syn_ack_packet.get_seq() + 1;
+            next_byte_to_send = syn_ack_packet.get_ack();
+            // send ack
+            ack_needed = true;
+            cerr << "state = CONNECTED" << endl;
+            state = CONNECTED;
+            break;
+        }
+        // case SERVER_AWAIT:
+        // {
+        //     while (1)
+        //     {
+        //         receive_packet();
+        //         if (!receiving_buffer.empty())
+        //             break;
+        //     }
+        //     Packet ack_packet = receiving_buffer[0];
+        //     receiving_buffer.clear();
+        //     next_byte_to_send = ack_packet.get_ack();
+        //     cerr << "received ack: " << next_byte_to_send << endl;
+        //     ack_packet.write_packet_to_stderr();
+        //     state = CONNECTED;
+        //     break;
+        // }
+        case CONNECTED:
+        {
+            while (1)
+            {
+                receive_packet();
+                update_receiving_buffer();
+                create_packet_from_input();
+                send_packet();
+            }
+        }
+        default:
+        {
+            cerr << "Invalid state: " << state << endl;
+        }
+        }
     }
 }
 
@@ -84,7 +159,7 @@ void RDTLayer::add_packet_to_receiving_buffer(Packet p)
     }
 
     // don't add ack packets with no payload to receiving buffer
-    if (p.is_ack_set() && p.get_length() == 0)
+    if (p.is_ack_set() && p.get_length() == 0 && !p.is_syn_set())
         return;
 
     receiving_buffer.push_back(p);
@@ -92,13 +167,18 @@ void RDTLayer::add_packet_to_receiving_buffer(Packet p)
 
 void RDTLayer::send_packet()
 {
+    if (state == CONNECTED && ack_needed)
+    {
+
+        cerr << "from sent_packet: i should be sending an ack but im a little incompetent" << endl;
+        cerr << "sending buffer size: " << sending_buffer.size() << endl;
+    }
     // send the first packet in the sending buffer
 
     uint8_t network_data[PACKET_SIZE];
     int packet_length = 0;
 
     // if no packets, just send an ack
-    // TODO: don't send ack if the other side is already all updated
     if (!sending_buffer.empty())
     {
         Packet to_send = sending_buffer[0];
@@ -106,7 +186,7 @@ void RDTLayer::send_packet()
         packet_length = to_send.to_network_data(network_data);
         sock.send_to_socket(network_data, packet_length);
         sending_buffer.erase(sending_buffer.begin());
-        cerr << "SENDING NORMAL PACKET: " << endl;
+        cerr << "SENDING PACKET: " << endl;
         to_send.write_packet_to_stderr();
         cerr << "sending buffer size: " << sending_buffer.size() << endl;
     }
@@ -155,6 +235,7 @@ void RDTLayer::receive_packet()
         if (p.is_ack_set())
             update_sending_buffer(p.get_ack());
         add_packet_to_receiving_buffer(p);
+        cerr << "receiving buffer size: " << receiving_buffer.size() << endl;
     }
 }
 
