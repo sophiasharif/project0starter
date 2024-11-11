@@ -47,6 +47,9 @@ void RDTLayer::create_packet_from_input()
     if (length == -1)
         return;
 
+    if (length == 0)
+        return;
+
     if (length > MSS)
     {
         cerr << "Packet length exceeds maximum segment size" << endl;
