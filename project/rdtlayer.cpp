@@ -9,8 +9,8 @@ using namespace std;
 RDTLayer::RDTLayer(Socket &sock, RECEIVER_TYPE receiver_type) : sock(sock), ack_needed(false)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
-    seq = rand() % (UINT32_MAX / 2);
-    // seq = 0;
+    // seq = rand() % (UINT32_MAX / 2);
+    seq = 0;
     next_byte_to_send = seq;
     state = receiver_type == CLIENT ? CLIENT_START : SERVER_START;
 
@@ -68,6 +68,7 @@ void RDTLayer::start()
             receiving_buffer.clear();
             next_byte_to_receive = syn_ack_packet.get_seq() + 1;
             next_byte_to_send = syn_ack_packet.get_ack();
+            seq = next_byte_to_send;
             // send ack
             ack_needed = true;
             cerr << "state = CONNECTED" << endl;
@@ -167,12 +168,6 @@ void RDTLayer::add_packet_to_receiving_buffer(Packet p)
 
 void RDTLayer::send_packet()
 {
-    if (state == CONNECTED && ack_needed)
-    {
-
-        cerr << "from sent_packet: i should be sending an ack but im a little incompetent" << endl;
-        cerr << "sending buffer size: " << sending_buffer.size() << endl;
-    }
     // send the first packet in the sending buffer
 
     uint8_t network_data[PACKET_SIZE];
